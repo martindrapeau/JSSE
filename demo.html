@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<script src="/js/jquery.js" type="text/javascript" ></script>
+	<script src="/js/nik/jsse.js" type="text/javascript"></script>
+
+	<style type="text/css">
+		body {font-family: Arial, Verdana, Tahoma;width: 700px; padding: 0 50px 0 50px;}
+		textarea, input, ul {font-family: Arial, Verdana, Tahoma;width:100%;}
+		textarea {height: 100px;}
+		#stats {float:left; font-size:12px; font-weight:normal;}
+		#index_btn {float:right;margin-left: 10px;}
+		.matching_mode{float:left;width:auto;}
+		.radio_label{float:left;}
+		.float_right{float:right;}
+		.clear_left{clear:left;}
+		#matching_mode_container{float: left;padding: 5px 5px 5px 0;width: 450px;}
+		#sorting_mode_container{float:right;padding: 5px 0 5px 5px;}
+	</style>
+	
+	<script type="text/javascript">				
+		function refreshSearchResults() {		
+			var str = $('#search').val();
+			
+			var matching_mode = $('.matching_mode:checked').val();
+			var sorting_mode = $('#sorting_mode').val();
+			
+			var start = (new Date).getTime();
+			var line_nums = se.match(str,matching_mode,sorting_mode);
+			var elapsed_time = ((new Date).getTime() - start) / 1000;
+			
+			$('#out').empty();
+			
+			var index = se._index(str);
+			
+			var lines = $('#in').val().split("\n");
+			for (line in line_nums) {
+				$('#out').append("<li>"+strongWords(lines[line_nums[line]],index)+"</li>");
+			}
+			
+			var nb_results = line_nums.length;
+			$('#results_title').html('Results - ' + nb_results + ' found in ' + elapsed_time + ' second');
+		}
+	
+		$(document).ready(function() {			
+			window.se = new Jsse();
+			
+			$('#index_btn').click(function(e) {
+				se.clear();
+				var lines = $('#in').val().split("\n");
+				
+				var start = (new Date).getTime();
+				for (i in lines) se.add(lines[i], i);
+				var elapsed_time = ((new Date).getTime() - start) / 1000;
+				
+				$('#stats').html(se.size+" words indexed in " + elapsed_time + " second");
+			});
+			
+			$('.matching_mode').click(function() {
+				if ($('.matching_mode:checked').val() == 'any') {
+					$('#sorting_mode').attr('disabled','');
+				}
+				else {
+					$('#sorting_mode').attr('disabled','disabled');
+				}
+				
+				refreshSearchResults();
+			})
+			
+			$('#search').keyup(function(e) {
+				refreshSearchResults();
+			});			
+						
+			$('#sorting_mode').change(function() {
+				refreshSearchResults();
+			});
+			
+			$('#index_btn').click();
+			refreshSearchResults();
+			
+			$('#in').keyup(function() {
+				if ($('#auto_reindex:checked').length > 0) {
+					$('#index_btn').click();
+					refreshSearchResults();
+				}
+			});
+			
+			$('#auto_reindex').click(function() {
+				if ($('#auto_reindex:checked').length > 0) {
+					$('#index_btn').click();
+					refreshSearchResults();
+					
+					$('#index_btn').attr('disabled','disabled');
+				}
+				else {
+					$('#index_btn').attr('disabled','');
+				}
+			});
+		});
+		
+		// On a given element, adds <strong> tags around words
+		// matching.
+		function strongWords(str, words) {
+			for (word in words) {
+				var re = new RegExp("("+word+")", "gi");
+				str = str.replace(re, '<strong>$1</strong>');
+			}			
+			
+			return str
+		}
+	</script>
+</head>
+
+<body>
+	<h1>Javascript Simple Search Engine - Test</h1>
+	<p style="font-size:12px;">
+		<strong>Authors:</strong> <a href="mailto:martin@planbox.com">Martin Drapeau<a/>,  <a href="mailto:sebastien@wajam.com">Sebastien Giroux</a><br/>
+		<strong>Download:</strong> <a href="http://www.planbox.com/html/jsse/jsse.js">jsse.js</a><br/>
+		<strong>Documentation:</strong> <a href="http://www.planbox.com/code">www.planbox.com/code</a><br/>
+		<strong>Test Suite:</strong> <a href="http://www.planbox.com/html/jsse/test.html">test.html</a> (qunit)<br/>
+		<strong>Bugs and Enhancements:</strong> Visit our <a href="http://blog.planbox.com/2010/12/javascript-simple-search-engine/">blog post</a> and leave a comment.
+	</p>
+	<h2>Items to index</h2>
+	<textarea id="in">Instant search in Google is awesome!
+It will work find after you install that patch.
+I bought a red sports car.</textarea><br/>
+
+	<span id="stats"></span>
+	<button id="index_btn">Index again</button>
+	<div class="float_right"><input type="checkbox" id="auto_reindex" style="width: auto;"/> Auto reindex</div>
+	<br/>
+	
+	<h2>Search</h2>
+	
+	<div id="matching_mode_container">
+		<div class="radio_label">Matching Mode:</div>
+		<input type="radio" class="matching_mode" name="matching_mode" checked="checked" value="any" /> <div class="radio_label">Search for any terms</div>
+		<input type="radio" class="matching_mode" name="matching_mode" value="all" /> <div class="radio_label">Search for all terms</div>
+		<div class="clear_left"></div>
+	</div>
+	
+	<div id="sorting_mode_container">
+		<div class="radio_label">Sorting Mode:</div>
+		<select id="sorting_mode">
+			<option value="relevancy">Relevancy</option>
+			<option value="none">None</option>
+		</select>
+	</div>
+	
+	<input id="search" type="text" />
+	<br/>
+	<h2 id="results_title">Results</h2>
+
+	<ul id="out"></ul>
+</body>
+
+</html>

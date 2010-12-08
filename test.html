@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<script type="text/javascript" src="jquery.js" ></script>
+	<script type="text/javascript" src="jsse.js"></script>
+	<script type="text/javascript" src="qunit.js"></script>
+	<link type="text/css" rel="stylesheet" href="qunit.css"/>
+	
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			test("new, add, remove, getWords", function() {
+				expect(7);
+				
+				var jsse = new Jsse();
+				equals(jsse.size, 0, "Property size is 0");
+				
+				jsse.add('Instant search in Google is awesome!', 'quote');
+				equals(jsse.size, 4, "after add size is 4");
+				deepEqual(jsse.getWords(), ['instant', 'search', 'google', 'awesome'], "getWords");
+				
+				jsse.remove('instant', 'quote');
+				equals(jsse.size, 3, "after remove 'instant' size is 3");
+				deepEqual(jsse.getWords(), ['search', 'google', 'awesome'], "getWords");
+				
+				jsse.remove('search in Google is awesome!', 'quote');
+				equals(jsse.size, 0, "after remove all others size is 0");
+				deepEqual(jsse.getWords(), [], "getWords returns empty");
+			});
+			
+			test("match", function() {
+				expect(3);
+				var jsse = new Jsse();
+				
+				jsse.add('Instant search in Google is awesome!', 'quote');
+				jsse.add('It will work find after you install that patch.', 'instruction');
+				jsse.add('I bought a red car.', 'mid-life crisis');
+				equals(jsse.size, 15, "Property size is 15");
+				
+				var keys = jsse.match('Instant start with a red car');
+				deepEqual(keys, [], "match all (no args)");
+				
+				var keys = jsse.match('Instant start with a red car', 'any');
+				deepEqual(keys, ['quote', 'mid-life crisis'], "match any");
+			});
+			
+		});
+	</script>
+</head>
+
+<body>
+	<h1 id="qunit-header">Javascript Simple Search Engine - Regression Test</h1>
+	<p style="font-size:12px;">
+		<strong>Authors:</strong> <a href="mailto:martin@planbox.com">Martin Drapeau<a/>,  <a href="mailto:sebastien@wajam.com">Sebastien Giroux</a><br/>
+		<strong>Download:</strong> <a href="http://www.planbox.com/html/jsse/jsse.js">jsse.js</a><br/>
+		<strong>Documentation:</strong> <a href="http://www.planbox.com/code">www.planbox.com/code</a><br/>
+		<strong>Demo:</strong> <a href="http://www.planbox.com/html/jsse/demo.html">See it work live here</a><br/>
+		<strong>Bugs and Enhancements:</strong> Visit our <a href="http://blog.planbox.com/2010/12/javascript-simple-search-engine/">blog post</a> and leave a comment.
+	</p>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="qunit-fixture">test markup, will be hidden</div>
+</body>
+
+</html>
