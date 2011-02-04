@@ -241,8 +241,9 @@
 			//   weigth - the weight of the word (use its length for now)
 			//   count - the number of times it appears
 			var index = {};
+			if (!str) return index;
 			var words = str.split(' ');
-			for (var i in words) {
+			for (var i =0; i < words.length; i++) {
 				var word = this.normalize(words[i]);
 				if (word.length < 2) continue;
 				if (index[word]) {
