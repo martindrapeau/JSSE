@@ -259,13 +259,13 @@
 		};
 		
 		// Private helper function which normalizes a word removing 
-		// unecessary things (i.e. dots and prepositions).
+		// unecessary stop words and punctuation except dot is allowed.
 		// Also drops everything to lowercase.
-		// TO DO: Remove plural and normalize to common class name.
 		// Returns an empty string if the passed word was not pertinent.
 		this.normalize = function(word) {
 			word = word.toLowerCase();
-			word = $.trim(word.replace(/[^a-z0-9_\-\s]/gi, ''));
+			word = $.trim(word.replace(/[,\/#!$%\^&\*;:{}=`~]/g, ' '));
+			word = word.replace('(','').replace(')','');
 			if (indexOf(this.stop_list, word) != -1) return '';
 			return word;
 		};
